@@ -1,4 +1,4 @@
-# Duka Store — Snippe Payment Integration (Laravel 12)
+# Duka Store - Snippe Payment Integration (Laravel 12)
 
 A Laravel store that collects payments via **Mobile Money**, **Cards**, and **QR Codes** using the Snippe Payments API. Raw cURL, no SDK.
 
@@ -18,7 +18,7 @@ Set these in `.env`:
 
 ```
 SNIPPE_API_KEY=snp_your_key_here
-APP_URL=https://your-domain.com      # Must be HTTPS — Snippe sends webhooks here
+APP_URL=https://your-domain.com      # Must be HTTPS - Snippe sends webhooks here
 ```
 
 Then:
@@ -46,7 +46,7 @@ There are exactly **four** places where your Laravel app talks to Snippe. Everyt
 
 ---
 
-## 1. Configuration — `config/snippe.php`
+## 1. Configuration - `config/snippe.php`
 
 ```php
 return [
@@ -68,7 +68,7 @@ Every API call sends these headers automatically:
 
 ---
 
-## 2. Accepting Payments — `POST /v1/payments`
+## 2. Accepting Payments - `POST /v1/payments`
 
 There are three payment types. Each one maps to a different API call.
 
@@ -129,7 +129,7 @@ The USSD push is sent automatically. Customer enters their PIN on their phone to
 |---|---|---|
 | `payment_type` | string | Must be `"mobile"` |
 | `details.amount` | integer | Amount in smallest unit (e.g. 500 = 500 TZS) |
-| `details.currency` | string | `"TZS"` (Tanzanian Shilling — the only supported currency) |
+| `details.currency` | string | `"TZS"` (Tanzanian Shilling - the only supported currency) |
 | `phone_number` | string | Customer phone in international format (`255XXXXXXXXX`) |
 | `customer.firstname` | string | Customer's first name |
 | `customer.lastname` | string | Customer's last name |
@@ -185,7 +185,7 @@ $response = Http::withHeaders([...])->post('https://api.snippe.sh/v1/payments', 
 }
 ```
 
-**Your next step:** Redirect the customer to `payment_url`. Snippe handles the rest — card entry, 3D Secure, confirmation.
+**Your next step:** Redirect the customer to `payment_url`. Snippe handles the rest - card entry, 3D Secure, confirmation.
 
 **Additional required fields for card:**
 
@@ -246,7 +246,7 @@ $response = Http::withHeaders([...])->post('https://api.snippe.sh/v1/payments', 
 
 ---
 
-## 3. The Webhook — Your App Gets Notified
+## 3. The Webhook - Your App Gets Notified
 
 After payment, Snippe sends a `POST` to your `webhook_url`. This is how your app learns the final status without polling.
 
@@ -317,7 +317,7 @@ if (!hash_equals($expected, $signature)) {
 
 Always send an `Idempotency-Key` header with every `POST /v1/payments`.
 
-- **Max 30 characters** — longer keys return a 500 error
+- **Max 30 characters** - longer keys return a 500 error
 - **Same key + same body** = returns cached response (safe to retry)
 - **Same key + different body** = returns error
 - Keys are valid for **24 hours**
@@ -383,5 +383,3 @@ duka-store-laravel/
 │
 └── .env                        ← SNIPPE_API_KEY, APP_URL, SNIPPE_WEBHOOK_SECRET
 ```
-
-If you want a higher-level package that handles idempotency, signatures, error typing, and response parsing automatically, check out the [Snippe PHP SDK](../SDKs/snippe-php-sdk/).
