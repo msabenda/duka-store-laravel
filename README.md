@@ -313,7 +313,7 @@ if (!hash_equals($expected, $signature)) {
 
 ## 4. Important Rules
 
-### 🔐 Idempotency Keys
+### Idempotency Keys
 
 Always send an `Idempotency-Key` header with every `POST /v1/payments`.
 
@@ -330,7 +330,7 @@ Always send an `Idempotency-Key` header with every `POST /v1/payments`.
 'Idempotency-Key: ' . uniqid('my-order-reference-' . $orderId, true)  // may exceed 30 chars ✗
 ```
 
-### 🌐 Webhook URL must be HTTPS and reachable
+### Webhook URL must be HTTPS and reachable
 
 Snippe will reject webhook URLs that are `localhost`, `127.0.0.1`, or HTTP.
 
@@ -340,11 +340,11 @@ $baseUrl = config('app.url');
 $webhookUrl = $baseUrl . '/webhook';
 ```
 
-### 💵 Minimum amount
+### Minimum amount
 
 The minimum payment amount is **500 TZS** (5 smallest units). Anything lower returns a validation error.
 
-### ⏰ Payments expire after 4 hours
+### Payments expire after 4 hours
 
 If the customer doesn't complete the payment within 4 hours, its status changes to `expired`. Create a fresh payment if they want to retry.
 
