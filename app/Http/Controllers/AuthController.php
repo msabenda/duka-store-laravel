@@ -37,6 +37,7 @@ class AuthController extends Controller
             'firstname' => $user['firstname'],
             'lastname' => $user['lastname'],
             'email' => $user['email'],
+            'phone' => $user['phone'] ?? '',
         ]);
 
         return redirect()->intended('/');
@@ -53,6 +54,7 @@ class AuthController extends Controller
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
             'password' => 'required|min:8|confirmed',
         ]);
 
@@ -66,6 +68,7 @@ class AuthController extends Controller
             'firstname' => $validated['firstname'],
             'lastname' => $validated['lastname'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'],
             'password' => password_hash($validated['password'], PASSWORD_BCRYPT),
             'created_at' => now()->toIso8601String(),
         ];

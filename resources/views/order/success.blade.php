@@ -1,10 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Order Confirmed')
+@section('title', ($order['status'] ?? '') === 'completed' ? 'Order Confirmed' : 'Payment Pending')
 
 @section('content')
     <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="bg-white rounded-2xl p-8 border border-green-100 shadow-sm text-center">
+            @if(($order['status'] ?? '') === 'completed')
             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
                 <svg class="w-8 h-8 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
@@ -13,6 +14,16 @@
 
             <h1 class="text-2xl font-bold text-gray-900 mb-2">Order Confirmed</h1>
             <p class="text-gray-500 mb-8">Thanks for your purchase. Your order has been placed.</p>
+            @else
+            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                <svg class="w-8 h-8 text-yellow-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Payment Pending</h1>
+            <p class="text-gray-500 mb-8">Your order is waiting for Snippe to confirm the payment. The status updates automatically when the webhook arrives - <a href="{{ url()->current() }}" class="text-teal-600 underline">refresh to check</a>.</p>
+            @endif
 
             <div class="bg-green-50 rounded-2xl p-6 mb-8 text-left border border-green-100">
                 <div class="flex items-center justify-between mb-3">

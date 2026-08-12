@@ -8,14 +8,20 @@ class SnippeApiService
 {
     protected string $apiKey;
     protected string $apiBase;
+    protected string $sessionsApiBase;
     protected string $version;
 
     public function __construct()
     {
         $this->apiKey = config('snippe.api_key');
         $this->apiBase = config('snippe.api_base');
+        $this->sessionsApiBase = config('snippe.api_base_sessions');
         $this->version = config('snippe.version');
     }
+
+    // ── /v1 payments endpoint (SNIPPE_API_BASE = https://api.snippe.sh/v1) ──
+    // The three payment methods below power the custom checkout form flow
+    // (mobile / card / QR) - currently disabled in this demo. Kept for future use.
 
     /**
      * Mobile Money — customer receives a USSD push to authorize payment.
@@ -58,6 +64,15 @@ class SnippeApiService
     /**
      * Card Payment — customer is redirected to a secure checkout page.
      * Docs: https://docs.snippe.sh/docs/2026-01-25/payments/card
+     *
+     * 🎙️ DA NOTE — HOSTED CHECKOUT / PAYMENT SESSIONS (Session 3)
+     * This is the "create session" step: Snippe returns a payment_url
+     * (the Sessions API calls it checkout_url) to redirect the customer to.
+     * redirectUrl/cancelUrl bring them back to your site, webhook_url receives
+     * the async status update, and metadata is your reconciliation key.
+     * Docs: https://docs.snippe.sh/docs/2026-01-25/sessions
+     *       https://docs.snippe.sh/docs/2026-01-25/sessions/profiles
+     *       https://docs.snippe.sh/docs/2026-01-25/sessions/payment-links
      */
     public function createCardPayment(
         int $amount,
@@ -157,9 +172,103 @@ class SnippeApiService
     /**
      * Raw cURL request to the Snippe API.
      */
-    protected function request(string $method, string $endpoint, ?array $body = null): array
+    /**
+     * 🎙️ DA NOTE — PAYMENT SESSIONS / HOSTED CHECKOUT (Series 3): creates a
+     * hosted checkout session. The response's checkout_url is the Snippe page
+     * the customer is redirected to — they fill/confirm their details and pay
+     * there (mobile money). metadata.order_reference is how the webhook
+     * reconciles the payment.
+     * Docs: https://docs.snippe.sh/docs/2026-01-25/sessions
+     *       https://docs.snippe.sh/docs/2026-01-25/sessions/payment-links
+     *       https://docs.snippe.sh/docs/2026-01-25/sessions/profiles
+     * NOTE: sessions live on the /api/v1 base (SNIPPE_API_BASE_SESSIONS), NOT
+     * the /v1 payments base.
+     */
+    public function createSession(
+        int $amount,                // Min 500. Suggested amount when allow_custom_amount is true
+        string $currency = 'TZS',   // ISO 4217 (only TZS is supported)
+        array $customer = [],       // Pre-fills checkout form (name, email, phone)
+        ?string $redirectUrl = null, // Where to send customer after payment (max 500 chars)
+        ?string $webhookUrl = null,  // Receives payment events (max 500 chars)
+        ?array $metadata = null,     // Max 50 keys - your reconciliation data
+        ?string $description = null, // Max 500 chars - shown on the checkout page
+        ?array $allowedMethods = null, // Default ["mobile_money"]
+        ?int $expiresIn = null,      // Default 3600s. Range 60-86400
+        ?bool $allowCustomAmount = null, // Customer enters their own amount at checkout
+        ?int $minAmount = null,      // Required when custom; min 500, must be < max_amount
+        ?int $maxAmount = null,      // Required when custom; must be > min_amount
+        ?string $profileId = null,   // Payment profile for branding (dashboard-managed)
+        ?array $lineItems = null,    // Max 50 items. Display-only (show the cart)
+        ?array $customFields = null, // Max 20 fields. Collect extra info at checkout
+        ?array $display = null       // Checkout UI settings (theme, button text, etc.)
+    ): array {
+        $payload = [
+            'amount' => $amount,
+            'currency' => $currency,
+        ];
+
+        if ($allowedMethods) {
+            $payload['allowed_methods'] = $allowedMethods;
+        }
+
+        if ($allowCustomAmount !== null) {
+            $payload['allow_custom_amount'] = $allowCustomAmount;
+        }
+
+        if ($minAmount !== null) {
+            $payload['min_amount'] = $minAmount;
+        }
+
+        if ($maxAmount !== null) {
+            $payload['max_amount'] = $maxAmount;
+        }
+
+        if ($customer) {
+            $payload['customer'] = $customer;
+        }
+
+        if ($profileId) {
+            $payload['profile_id'] = $profileId;
+        }
+
+        if ($redirectUrl) {
+            $payload['redirect_url'] = $redirectUrl;
+        }
+
+        if ($webhookUrl) {
+            $payload['webhook_url'] = $webhookUrl;
+        }
+
+        if ($description) {
+            $payload['description'] = $description;
+        }
+
+        if ($metadata) {
+            $payload['metadata'] = $metadata;
+        }
+
+        if ($expiresIn) {
+            $payload['expires_in'] = $expiresIn;
+        }
+
+        if ($lineItems) {
+            $payload['line_items'] = $lineItems;
+        }
+
+        if ($customFields) {
+            $payload['custom_fields'] = $customFields;
+        }
+
+        if ($display) {
+            $payload['display'] = $display;
+        }
+
+        return $this->request('POST', 'sessions', $payload, $this->sessionsApiBase);
+    }
+
+    protected function request(string $method, string $endpoint, ?array $body = null, ?string $base = null): array
     {
-        $url = rtrim($this->apiBase, '/') . '/' . ltrim($endpoint, '/');
+        $url = rtrim($base ?? $this->apiBase, '/') . '/' . ltrim($endpoint, '/');
 
         $ch = curl_init();
 
@@ -215,17 +324,43 @@ class SnippeApiService
 
         $success = $httpCode >= 200 && $httpCode < 300;
 
-        Log::info('Snippe API response', [
-            'url' => $url,
-            'http_code' => $httpCode,
-            'success' => $success,
-            'body' => $decoded,
-        ]);
+        // Pull the API's own error message out of common response shapes so the
+        // UI shows the real reason instead of a generic fallback.
+        $apiMessage = null;
+        if (is_array($decoded)) {
+            if (isset($decoded['message'])) {
+                $apiMessage = $decoded['message'];
+            } elseif (isset($decoded['error']) && is_string($decoded['error'])) {
+                $apiMessage = $decoded['error'];
+            } elseif (isset($decoded['error']['message'])) {
+                $apiMessage = $decoded['error']['message'];
+            } elseif (isset($decoded['detail'])) {
+                $apiMessage = $decoded['detail'];
+            } elseif (isset($decoded['data']['message'])) {
+                $apiMessage = $decoded['data']['message'];
+            }
+        }
+
+        if ($success) {
+            Log::info('Snippe API response', [
+                'url' => $url,
+                'http_code' => $httpCode,
+                'success' => $success,
+                'body' => $decoded,
+            ]);
+        } else {
+            Log::warning('Snippe API error', [
+                'url' => $url,
+                'http_code' => $httpCode,
+                'body' => $decoded,
+            ]);
+        }
 
         return [
             'success' => $success,
             'http_code' => $httpCode,
             'data' => $decoded,
+            'error' => $success ? null : ($apiMessage ?? ('HTTP ' . $httpCode . ' - ' . mb_substr($response, 0, 300))),
         ];
     }
 }

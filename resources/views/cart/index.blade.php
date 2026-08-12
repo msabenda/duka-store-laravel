@@ -90,10 +90,14 @@
                             </div>
                         </div>
 
-                        <a href="{{ route('checkout.index') }}"
-                           class="block w-full text-center bg-gray-900 text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/10 text-sm">
-                            Checkout
-                        </a>
+                        {{-- Mobile money checkout - card/QR unavailable in this Snippe environment. Uncomment to restore: --}}
+                        {{-- <a href="{{ route('checkout.index') }}" class="block w-full text-center bg-gray-900 text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/10 text-sm">Checkout</a> --}}
+                        <form method="POST" action="{{ route('checkout.pay') }}" class="block w-full">
+                            @csrf
+                            <button type="submit" class="block w-full text-center bg-gray-900 text-white py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/10 text-sm">
+                                Checkout
+                            </button>
+                        </form>
 
                         <p class="text-xs text-gray-400 text-center mt-3 flex items-center justify-center gap-1">
                             <svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

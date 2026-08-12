@@ -1,3 +1,7 @@
+{{-- 🎙️ DA NOTE — YOUR CUSTOM CHECKOUT (you built this page — reused in later sessions) --}}
+{{-- Customer details + payment method selection. Posts to /checkout/mobile, /checkout/card, /checkout/qr. --}}
+{{-- Snippe's hosted checkout (the payment_url redirect) is the alternative to this page. --}}
+{{-- ⚠️ DISABLED FOR NOW - hosted Snippe checkout only. Route + controller commented out in routes/web.php and CheckoutController.php; re-enable to use this page again. --}}
 @extends('layouts.app')
 
 @section('title', 'Checkout')

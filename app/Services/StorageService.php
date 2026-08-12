@@ -57,6 +57,19 @@ class StorageService
         return null;
     }
 
+    public function getOrderBySnippeReference(string $snippeReference): ?array
+    {
+        $orders = $this->readJson('orders.json');
+
+        foreach ($orders as $order) {
+            if (($order['snippe_reference'] ?? '') === $snippeReference) {
+                return $order;
+            }
+        }
+
+        return null;
+    }
+
     public function getOrderById(int $id): ?array
     {
         $orders = $this->readJson('orders.json');

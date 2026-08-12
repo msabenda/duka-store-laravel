@@ -29,11 +29,21 @@ Route::prefix('cart')->group(function () {
 
 // Checkout routes
 Route::prefix('checkout')->group(function () {
-    Route::get('/', [CheckoutController::class, 'index'])->name('checkout.index');
+    // Custom checkout page (GET /checkout) DISABLED for now - mobile money
+    // checkout only (POST /checkout/pay). Card/QR unavailable in this Snippe
+    // environment. Uncomment to restore:
+    // Route::get('/', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('pay', [CheckoutController::class, 'processPay'])->name('checkout.pay');
     Route::post('mobile', [CheckoutController::class, 'processMobile'])->name('checkout.mobile');
     Route::post('card', [CheckoutController::class, 'processCard'])->name('checkout.card');
     Route::post('qr', [CheckoutController::class, 'processQr'])->name('checkout.qr');
 });
+
+// Success page - the customer lands here after paying on Snippe's hosted
+// checkout (?ref= order reference). It shows the order's REAL status and
+// polls /success/status. Registered before the order routes on purpose.
+Route::get('success/status', [CheckoutController::class, 'successStatus'])->name('checkout.success.status');
+Route::get('success', [CheckoutController::class, 'success'])->name('checkout.success');
 
 // Order routes
 Route::prefix('order')->group(function () {
