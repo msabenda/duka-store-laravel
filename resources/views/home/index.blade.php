@@ -29,13 +29,13 @@
                 </div>
                 <div class="flex-1 flex justify-center">
                     <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
-                        <img src="/images/tee.svg" alt="Cotton Tee"
+                        <img src="/images/img1.jpg" alt="Cotton Tee"
                              class="rounded-2xl aspect-[3/4] object-cover w-full bg-green-50">
-                        <img src="/images/dress.svg" alt="Linen Dress"
+                        <img src="/images/img7.jpeg" alt="Linen Dress"
                              class="rounded-2xl aspect-[3/4] object-cover w-full mt-6 bg-green-50">
-                        <img src="/images/belt.svg" alt="Leather Belt"
+                        <img src="/images/img6.jpg" alt="Leather Belt"
                              class="rounded-2xl aspect-[3/4] object-cover w-full -mt-3 bg-green-50">
-                        <img src="/images/sneakers.svg" alt="Leather Sneakers"
+                        <img src="/images/img4.png" alt="Leather Sneakers"
                              class="rounded-2xl aspect-[3/4] object-cover w-full mt-3 bg-green-50">
                     </div>
                 </div>

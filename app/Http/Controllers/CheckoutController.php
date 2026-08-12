@@ -19,7 +19,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * DA NOTE — YOUR CUSTOM CHECKOUT (you built this page — reused in later sessions)
+     * 💡 LEARNER'S NOTE — YOUR CUSTOM CHECKOUT (you build this page yourself)
      * This is YOUR checkout page: customer details form + payment method buttons
      * (Mobile Money / Card / QR), rendered by resources/views/checkout/index.blade.php.
      * Snippe's hosted checkout (the payment_url redirect) is the alternative —
@@ -80,7 +80,7 @@ class CheckoutController extends Controller
     }
 
     /**
-     * 🎙️ DA NOTE — PAYMENT SESSIONS / HOSTED CHECKOUT (Series 3): the cart's
+     * 💡 LEARNER'S NOTE — PAYMENT SESSIONS / HOSTED CHECKOUT: the cart's
      * "Checkout" button posts here. It creates a PAYMENT SESSION with the cart
      * total + the logged-in user's details, then redirects the customer to
      * Snippe's HOSTED CHECKOUT page (checkout_url) where they fill/confirm
@@ -286,9 +286,9 @@ class CheckoutController extends Controller
         // Build URLs — use APP_URL from config so Snippe gets your ngrok/domain URL
         $baseUrl = rtrim(config('app.url'), '/');
         $baseUrl = str_replace('http://', 'https://', $baseUrl);
-        //  DA NOTE — SESSION → REDIRECT → RETURN URL FLOW (Session 3)
+        //  💡 LEARNER'S NOTE — SESSION → REDIRECT → RETURN URL FLOW
         // One payment session per checkout intent. The DUKA- reference is baked
-        // into the return URLs AND metadata so the webhook (next session!) can
+        // into the return URLs AND metadata so the webhook can
         // reconcile the payment back to this order. Reference + metadata = audit trail.
         // Success lands on /order/success/{ref}, cancel lands on /order/{ref}
         // (route order.show) — the customer always comes back to your site.
@@ -382,7 +382,7 @@ class CheckoutController extends Controller
         $this->storage->saveOrder($orderData);
 
         // Clear cart
-        //  DA NOTE — ONE SESSION PER CHECKOUT INTENT: cart cleared right after
+        //  💡 LEARNER'S NOTE — ONE SESSION PER CHECKOUT INTENT: cart cleared right after
         // the session is created. Never loop/re-create sessions on retries.
         session()->forget('cart');
 
@@ -397,7 +397,7 @@ class CheckoutController extends Controller
             }
 
             // Card and QR — redirect to hosted checkout page
-            //  DA NOTE — REDIRECT ≠ PROOF OF PAYMENT: the customer landing on
+            //  💡 LEARNER'S NOTE — REDIRECT ≠ PROOF OF PAYMENT: the customer landing on
             // redirect_url only proves they visited checkout. The order stays
             // 'pending' until the webhook flips it — never trust the redirect.
             $checkoutUrl = $responseData['payment_url'] ?? null;

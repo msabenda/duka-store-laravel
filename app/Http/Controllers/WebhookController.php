@@ -17,7 +17,7 @@ class WebhookController extends Controller
 
     public function handle(Request $request)
     {
-        // 🎙️ DA NOTE — REDIRECT ≠ PROOF OF PAYMENT (Session 3 framing): the
+        // 💡 LEARNER'S NOTE — REDIRECT ≠ PROOF OF PAYMENT: the
         // return URL leaves the order 'pending'. THIS handler is what flips it
         // to completed — after the signature verifies. Webhooks = source of truth.
         $payload = $request->all();

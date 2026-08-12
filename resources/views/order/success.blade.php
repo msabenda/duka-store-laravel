@@ -43,7 +43,7 @@
                 @if(isset($order['items'][0]))
                 <div class="border-t border-green-100 mt-4 pt-4 flex items-center gap-3">
                     <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-green-100">
-                        <img src="{{ $order['items'][0]['image'] ?? '/images/tee.svg' }}"
+                        <img src="{{ $order['items'][0]['image'] ?? '/images/img1.jpg' }}"
                              alt="{{ $order['items'][0]['product_name'] }}"
                              class="w-full h-full object-cover">
                     </div>

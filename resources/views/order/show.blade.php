@@ -56,7 +56,7 @@
                         <div class="flex items-center justify-between text-sm bg-green-50 rounded-xl px-4 py-3">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-green-100 bg-green-50">
-                                    <img src="{{ $item['image'] ?? '/images/tee.svg' }}"
+                                    <img src="{{ $item['image'] ?? '/images/img1.jpg' }}"
                                          alt="{{ $item['product_name'] }}"
                                          class="w-full h-full object-cover">
                                 </div>

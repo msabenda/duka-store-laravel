@@ -65,7 +65,7 @@ class SnippeApiService
      * Card Payment — customer is redirected to a secure checkout page.
      * Docs: https://docs.snippe.sh/docs/2026-01-25/payments/card
      *
-     * 🎙️ DA NOTE — HOSTED CHECKOUT / PAYMENT SESSIONS (Session 3)
+     * 💡 LEARNER'S NOTE — HOSTED CHECKOUT / PAYMENT SESSIONS
      * This is the "create session" step: Snippe returns a payment_url
      * (the Sessions API calls it checkout_url) to redirect the customer to.
      * redirectUrl/cancelUrl bring them back to your site, webhook_url receives
@@ -173,7 +173,7 @@ class SnippeApiService
      * Raw cURL request to the Snippe API.
      */
     /**
-     * 🎙️ DA NOTE — PAYMENT SESSIONS / HOSTED CHECKOUT (Series 3): creates a
+     * 💡 LEARNER'S NOTE — PAYMENT SESSIONS / HOSTED CHECKOUT: creates a
      * hosted checkout session. The response's checkout_url is the Snippe page
      * the customer is redirected to — they fill/confirm their details and pay
      * there (mobile money). metadata.order_reference is how the webhook
