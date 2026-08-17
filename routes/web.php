@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WebhookController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -57,5 +58,11 @@ Route::prefix('dashboard')->group(function () {
     Route::get('order/{ref}', [DashboardController::class, 'show'])->name('dashboard.order');
 });
 
-// Webhook route
-Route::post('webhook', [WebhookController::class, 'handle'])->name('webhook');
+// Snippe webhook routes. Snippe sends to /webhooks/snippe according to the
+// docs, but we keep /webhook as a compatibility alias for local tooling.
+// External webhook posts must skip CSRF, otherwise Laravel rejects them with
+// 419 Page Expired before the signature is even verified.
+Route::withoutMiddleware([VerifyCsrfToken::class])->group(function () {
+    Route::post('webhooks/snippe', [WebhookController::class, 'handle'])->name('webhooks.snippe');
+    Route::post('webhook', [WebhookController::class, 'handle'])->name('webhook');
+});

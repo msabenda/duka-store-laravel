@@ -116,6 +116,32 @@ class StorageService
         $this->writeJson('orders.json', $orders);
     }
 
+    public function hasProcessedWebhookEvent(string $eventId): bool
+    {
+        $events = $this->readJson('webhook-events.json');
+
+        foreach ($events as $event) {
+            if (($event['event_id'] ?? '') === $eventId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function markWebhookEventProcessed(string $eventId, array $payload = []): void
+    {
+        $events = $this->readJson('webhook-events.json');
+
+        $events[] = [
+            'event_id' => $eventId,
+            'processed_at' => now()->toIso8601String(),
+            'payload' => $payload,
+        ];
+
+        $this->writeJson('webhook-events.json', $events);
+    }
+
     public function getAllOrders(): array
     {
         return $this->readJson('orders.json');

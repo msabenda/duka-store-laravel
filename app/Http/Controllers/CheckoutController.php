@@ -134,7 +134,7 @@ class CheckoutController extends Controller
         $baseUrl = rtrim(config('app.url'), '/');
         $baseUrl = str_replace('http://', 'https://', $baseUrl);
         $redirectUrl = $baseUrl . '/success?ref=' . $reference;
-        $webhookUrl = $baseUrl . '/webhook';
+        $webhookUrl = $baseUrl . '/webhooks/snippe';
 
         $customer = [
             'name' => $name,
